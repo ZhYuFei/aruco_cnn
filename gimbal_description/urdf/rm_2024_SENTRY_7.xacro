@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- RoboMaster 2024 哨兵7号 -->
+<robot name="rm_2024_SENTRY_7"
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <link name="odom" />
+  <link name="gimbal_middle_link" />
+  <link name="gimbal_link" />
+  <link name="gun_link" />
+  <link name="camera_link" />
+  <link name="camera_optical_frame" />
+
+  <joint name="gimbal_joint" type="floating">
+    <parent link="odom" />
+    <child link="gimbal_middle_link" />
+  </joint>
+
+
+  <joint name="gimbal_middle_joint" type="floating">
+    <origin xyz="-0.0690247 0 0" rpy="0 0 0" />
+    <parent link="gimbal_middle_link" />
+    <child link="gimbal_link" />
+  </joint>
+
+
+  <joint name="gun_joint" type="fixed">
+    <origin xyz="0.116 0 0" rpy="0 0 0" />
+    <parent link="gimbal_link" />
+    <child link="gun_link" />
+  </joint>
+
+
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.164402 0.0365 -0.040173" rpy="0 ${-4.7/180*pi} ${-2.7/180*pi}" />
+    <parent link="gimbal_link" />
+    <child link="camera_link" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+
+  <joint name="camera_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="camera_link" />
+    <child link="camera_optical_frame" />
+  </joint>
+
+</robot>
