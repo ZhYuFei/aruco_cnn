@@ -13,7 +13,7 @@ class ArucoDetector(Node):
         super().__init__('aruco_detector')
         
         # 参数声明
-        self.declare_parameter('marker_length', 0.00088)  # 默认5厘米
+        self.declare_parameter('marker_length', 0.00088)  # 默认5厘米r
         self.declare_parameter('camera_frame', 'camera_optical_frame')
         
         # 获取参数
