@@ -3,7 +3,7 @@
 <package format="3">
   <name>aruco_launch</name>
   <version>0.0.1</version>
-  <description>NCUT DreamTeam RoboMaster ROS2 Package: Buff Launch</description>
+  <description>zhou Package: aruco_launch</description>
   <maintainer email="zhou@todo.todo">zhou</maintainer>
   <license>GPLv3</license>
 
@@ -13,7 +13,6 @@
   <depend>rclcpp_components</depend>
   <depend>std_msgs</depend>
   <depend>visualization_msgs</depend>
-  <depend>ifr_interface</depend>
   <depend>cv_bridge</depend>
   <depend>geometry_msgs</depend>
   <depend>gimbal_description</depend>

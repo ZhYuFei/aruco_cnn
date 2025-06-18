@@ -5,8 +5,10 @@ import rclpy
 from rclpy.node import Node
 from cv_bridge import CvBridge
 from visualization_msgs.msg import Marker, MarkerArray
-from geometry_msgs.msg import Point, Pose, Quaternion
+from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import Image
+
+MARKER_SIZE = 200  # 像素
 
 class ArucoDetector(Node):
     def __init__(self):
@@ -25,10 +27,10 @@ class ArucoDetector(Node):
         self.parameters = cv2.aruco.DetectorParameters()
         self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.parameters)
         
-        # 相机参数（需要根据实际校准填写）
+        # 相机参数
         self.camera_matrix = np.array([
-            [500.0, 0.0, 320.0],
-            [0.0, 500.0, 240.0],
+            [520.9732, 0.0,     327.0129],
+            [0.0,      519.2718,246.9725],
             [0.0, 0.0, 1.0]
         ])
         self.dist_coeffs = np.zeros((4,1))
@@ -37,6 +39,7 @@ class ArucoDetector(Node):
         self.bridge = CvBridge()
         self.marker_pub = self.create_publisher(MarkerArray, 'aruco_markers', 10)
         self.image_pub = self.create_publisher(Image, 'aruco_debug_image', 10)
+        self.roi_pub = self.create_publisher(Image, 'aruco_debug_roi', 10)
         
         # 初始化摄像头
         self.cap = cv2.VideoCapture(0)
@@ -46,6 +49,15 @@ class ArucoDetector(Node):
         # 定时器
         self.timer = self.create_timer(0.033, self.process_frame)  # ~30Hz
         self.get_logger().info(f"ArUco检测节点已启动，标记尺寸: {self.marker_length}m")
+
+    def process_marker(self,frame, corners):
+        """提取标记ROI并保存"""
+        # 透视校正
+        dst_pts = np.array([[0,0], [MARKER_SIZE,0], [MARKER_SIZE,MARKER_SIZE], [0,MARKER_SIZE]], dtype="float32")
+        M = cv2.getPerspectiveTransform(corners.astype("float32"), dst_pts)
+        warped = cv2.warpPerspective(frame, M, (MARKER_SIZE, MARKER_SIZE))
+
+        return cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
     def process_frame(self):
         ret, frame = self.cap.read()
@@ -68,6 +80,8 @@ class ArucoDetector(Node):
                 self.camera_matrix, self.dist_coeffs
             )
             
+            debug_frame = frame.copy()
+
             for i in range(len(ids)):
                 # 创建单个Marker
                 marker = Marker()
@@ -107,6 +121,8 @@ class ArucoDetector(Node):
                 # 设置生命周期（300ms）
                 marker.lifetime.sec = 0
                 marker.lifetime.nanosec = 100000000
+
+                self.roi_pub.publish(self.bridge.cv2_to_imgmsg(self.process_marker(debug_frame,corners[i][0]),"mono8"))
                 
                 # 添加到数组
                 marker_array.markers.append(marker)
