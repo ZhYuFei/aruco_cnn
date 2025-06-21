@@ -42,7 +42,7 @@ class ArucoClassifier(torch.nn.Module):
 # 初始化模型
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = ArucoClassifier().to(device)
-model.load_state_dict(torch.load("best_classifier.pth", map_location=device))
+model.load_state_dict(torch.load("best_classifier_cnn.pth", map_location=device))
 model.eval()
 
 # 图像预处理

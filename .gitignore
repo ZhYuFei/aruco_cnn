@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 .vscode/
 
+aruco_classification/
+aruco_dataset/
 install/
 log/
 
